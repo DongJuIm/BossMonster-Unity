@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Monster : MonoBehaviour
 {
 
-    Animator bossAnim;
+    
+
+    int ran;
+    int mask;
 
     const int CREATE_TO_POS_WEAPON = 0;
     const int CREATE_TO_POS_JAW = 1;
@@ -13,46 +17,48 @@ public class Monster : MonoBehaviour
 
     const string FALSE_DAMAGE = "Damage";
     const string FALSE_ATTATCK = "Attack";
-
-
-    public Transform jawPos;
+   
     public Transform target;
-    public Transform firePos;
-
-    public Vector3 target_pos;
-    public static Vector3 tmpPos;
-
-    int ran;
-    int mask;
     public int bosshaert = 10;//보스체력
 
 
-    public float[] eTime;
-    public float rot_speed = 1;
-    public float check_delayTime = 5f;
-    public float anim_delayTime = 7f;
-    public float ViewDistance = 50;
-    public float ViewAngle = 60;
-
-    float currentTime;
-
-    bool isParallel = false;
-    bool isAlive = true;
-
-    public GameObject[] effect;
+    public Vector3 target_pos;
+    public static Vector3 tmpPos;
     public static string tagName;
 
+    private Animator bossAnim;
 
+    [SerializeField] private Transform firePos;
+    [SerializeField] private Transform jawPos;
 
+    [SerializeField] protected float[] eTime;
+    [SerializeField] protected float rot_speed = 1;
+    [SerializeField] protected float check_delayTime = 5f;
+    [SerializeField] protected float anim_delayTime = 7f;
+    [SerializeField] protected float ViewDistance = 50;
+    [SerializeField] protected float ViewAngle = 60;
 
-    public enum Monster_State { Idle, TargetTrace, Attack, Demage, Die }
+    [SerializeField] private GameObject[] effect;
+
+     private float currentTime;
+
+    protected bool isParallel = false;
+    protected bool isAlive = true;
+
+    [SerializeField] public enum Monster_State { Idle, TargetTrace, Attack, Demage, Die }
     public static Monster_State _ms;
 
-
+    AudioSource roarSound;
 
 
     void Init()
     {
+
+       // roarSound = gameObject.GetComponent<AudioSource>();
+      //  roarSound.Play(44100);
+      
+        
+            
 
         bossAnim = gameObject.GetComponent<Animator>();
         bossAnim.SetBool("appear", true);
@@ -65,15 +71,16 @@ public class Monster : MonoBehaviour
 
     private void Awake() { Init(); }
 
- 
-    private void Start() { StartCoroutine(Check_Player()); }
+
+    private void Start() { StartCoroutine(Check_Player());  }
 
     void Update() { DrawView(); M_State(); if (bosshaert == 0) { _ms = Monster_State.Die; } }
 
 
     void M_State()
     {
-        if (isAlive) {
+        if (isAlive)
+        {
 
 
             switch (_ms)
@@ -108,11 +115,11 @@ public class Monster : MonoBehaviour
             }
 
         }
-      
+
 
     }
 
-    void Idle(){bossAnim.SetBool("body_idle_001", true);}
+    void Idle() { bossAnim.SetBool("body_idle_001", true); }
 
     void TargetTrace()
     {
@@ -180,7 +187,8 @@ public class Monster : MonoBehaviour
 
             }
 
-        } else { FalseAnim(FALSE_ATTATCK); }
+        }
+        else { FalseAnim(FALSE_ATTATCK); }
 
     }
 
@@ -236,7 +244,7 @@ public class Monster : MonoBehaviour
     {
 
         bossAnim.SetBool("disappear", true);
-;
+        ;
         Debug.Log("Die");
 
     }
@@ -260,7 +268,7 @@ public class Monster : MonoBehaviour
 
                 float distToTarget = Vector3.Distance(transform.position, target.position);
 
-                Debug.Log("거리 : " + distToTarget);
+              //  Debug.Log("거리 : " + distToTarget);
 
                 tmpPos = target.position;
 
@@ -273,8 +281,8 @@ public class Monster : MonoBehaviour
 
                     isParallel = Angle_IsNan();
 
-                    if (isParallel) { _ms = Monster_State.Attack; isParallel = false;} // 마주 보고 있으면 공격
-                    else{_ms = Monster_State.TargetTrace; } // 그렇지 않으면 추적
+                    if (isParallel) { _ms = Monster_State.Attack; isParallel = false; } // 마주 보고 있으면 공격
+                    else { _ms = Monster_State.TargetTrace; } // 그렇지 않으면 추적
 
                 }
 
@@ -328,7 +336,7 @@ public class Monster : MonoBehaviour
                 bossAnim.SetBool("attack_005", false);
                 bossAnim.SetBool("attack_006", false);
                 bossAnim.SetBool("roar", false);
-                bossAnim.SetBool("body_idle_001", true);
+               // bossAnim.SetBool("body_idle_001", true);
 
 
                 break;
@@ -354,10 +362,10 @@ public class Monster : MonoBehaviour
         float dot = Vector3.Dot(transform.forward, target.forward);
         float acos = Mathf.Acos(dot);
 
-        //Debug.Log("각도 : "+acos);
+        Debug.Log("각도 : "+acos);
 
         // if (float.IsNaN(acos))
-        if (acos > 3f)
+        if (acos < 3f)
         {
             //이하면 범위 공격
             return true;
